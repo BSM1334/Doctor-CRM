@@ -1,0 +1,235 @@
+{% extends "webapp/base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<style>
+    /* Make Delete Shortcut button text black on hover */
+    #uninstall-pwa-btn:hover {
+        color: #000 !important;
+    }
+
+    #uninstall-pwa-btn:hover i {
+        color: #000 !important;
+    }
+
+    /* Make Add Shortcut button text black on hover */
+    #install-pwa-btn:hover {
+        color: #000 !important;
+    }
+
+    #install-pwa-btn:hover i {
+        color: #000 !important;
+    }
+</style>
+
+<div class="text-center" style="padding: 4rem 1rem;">
+    <h1
+        style="color: var(--gold-accent); border-bottom: 3px solid var(--gold-accent); padding-bottom: 1rem; margin-bottom: 2rem;">
+        {% trans "Doctor Real Estate CRM" %}</h1>
+    <h2 style="color: var(--text-secondary); margin-bottom: 2rem;">{% trans "Professional Real Estate Management System" %}</h2>
+    <hr style="border: 1px solid var(--border-color); margin: 2rem 0;">
+    <p class="lead" style="color: var(--text-secondary); font-size: 1.2rem; margin-bottom: 2rem;">{% trans "Manage your clients, track deals, and grow your business efficiently." %}</p>
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        {% if user.is_authenticated %}
+        <a class="btn btn-primary btn-lg" href="{% url 'sales_dashboard' %}" style="min-width: 200px;">
+            <i class="fa fa-home" aria-hidden="true"></i> &nbsp; {% trans "Go to Dashboard" %}
+        </a>
+        {% else %}
+        <a class="btn btn-primary btn-lg" href="{% url 'register' %}" style="min-width: 200px;">
+            <i class="fa fa-user-plus" aria-hidden="true"></i> &nbsp; {% trans "Create Account" %}
+        </a>
+        <a class="btn btn-secondary btn-lg" href="{% url 'login' %}" style="min-width: 200px;">
+            <i class="fa fa-sign-in" aria-hidden="true"></i> &nbsp; {% trans "Login" %}
+        </a>
+        {% endif %}
+
+        <button id="install-pwa-btn" class="btn btn-outline-warning btn-lg"
+            style="min-width: 200px; display: none; border-color: var(--gold-accent); color: var(--gold-accent);">
+            <i class="fa fa-plus-square" aria-hidden="true"></i> &nbsp; {% trans "Add shortcut" %}
+        </button>
+        <button id="uninstall-pwa-btn" class="btn btn-outline-danger btn-lg"
+            style="min-width: 200px; display: none; border-color: #dc3545; color: #dc3545;">
+            <i class="fa fa-trash" aria-hidden="true"></i> &nbsp; {% trans "Delete shortcut" %}
+        </button>
+    </div>
+</div>
+
+<!-- Uninstall Instructions Modal -->
+<div class="modal fade" id="uninstallModal" tabindex="-1" aria-labelledby="uninstallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content"
+            style="background-color: var(--secondary-bg); border: 2px solid #dc3545; color: var(--text-primary);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                <h5 class="modal-title" id="uninstallModalLabel" style="color: #dc3545;">
+                    <i class="fa fa-trash" aria-hidden="true"></i> {% trans "Remove Shortcut" %}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="uninstallInstructions" style="color: var(--text-secondary);"></p>
+                <ul id="uninstallSteps" style="padding-left: 1.25rem; color: var(--text-secondary);"></ul>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Close" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- iOS Install Instructions Modal -->
+<div class="modal fade" id="iosInstallModal" tabindex="-1" aria-labelledby="iosInstallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content"
+            style="background-color: var(--secondary-bg); border: 2px solid var(--gold-accent); color: var(--text-primary);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                <h5 class="modal-title" id="iosInstallModalLabel" style="color: var(--gold-accent);">
+                    <i class="fa fa-apple" aria-hidden="true"></i> {% trans "Add Shortcut to Home Screen" %}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{% trans "Follow these simple steps to add Doctor Real Estate CRM to your home screen:" %}</p>
+                <ol style="padding-left: 1.25rem;">
+                    <li class="mb-2">{% trans "Tap the 'Share' button in Safari (icon looks like a square with an arrow pointing up)." %}</li>
+                    <li class="mb-2">{% trans "Scroll down and tap 'Add to Home Screen' (+ icon)." %}</li>
+                    <li class="mb-2">{% trans "Tap 'Add' in the top right corner." %}</li>
+                </ol>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Close" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-pwa-btn');
+        const iosModalEl = document.getElementById('iosInstallModal');
+        const iosModal = iosModalEl ? new bootstrap.Modal(iosModalEl) : null;
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        function isStandaloneMode() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+
+        function showInstallBtn() {
+            if (!installBtn) return;
+            installBtn.style.display = 'inline-flex';
+            installBtn.style.alignItems = 'center';
+            installBtn.style.justifyContent = 'center';
+        }
+
+        function hideInstallBtn() {
+            if (!installBtn) return;
+            installBtn.style.display = 'none';
+        }
+
+        const uninstallBtn = document.getElementById('uninstall-pwa-btn');
+        const uninstallModalEl = document.getElementById('uninstallModal');
+        const uninstallModal = uninstallModalEl ? new bootstrap.Modal(uninstallModalEl) : null;
+
+        function showUninstallBtn() {
+            if (!uninstallBtn) return;
+            uninstallBtn.style.display = 'inline-flex';
+            uninstallBtn.style.alignItems = 'center';
+            uninstallBtn.style.justifyContent = 'center';
+        }
+
+        function hideUninstallBtn() {
+            if (!uninstallBtn) return;
+            uninstallBtn.style.display = 'none';
+        }
+
+        function updateInstallButtonVisibility() {
+            if (!installBtn) return;
+            if (isStandaloneMode()) {
+                hideInstallBtn();
+                showUninstallBtn();
+                return;
+            } else {
+                hideUninstallBtn();
+            }
+            if (isIOS) {
+                showInstallBtn();
+            } else {
+                if (deferredPrompt) showInstallBtn();
+                else hideInstallBtn();
+            }
+        }
+
+        // Initial visibility check
+        updateInstallButtonVisibility();
+
+        if (isIOS) {
+            if (installBtn && iosModal) {
+                installBtn.addEventListener('click', () => iosModal.show());
+            }
+            if (uninstallBtn && uninstallModal) {
+                uninstallBtn.addEventListener('click', () => {
+                    // iOS uninstall instructions
+                    const instr = document.getElementById('uninstallInstructions');
+                    const steps = document.getElementById('uninstallSteps');
+                    instr.textContent = `{% trans "To remove the Home Screen shortcut on iOS:" %}`;
+                    steps.innerHTML = `
+            <li>{% trans "Long-press the app icon on your Home Screen." %}</li>
+            <li>{% trans "Tap 'Remove Bookmark' or 'Delete Bookmark' depending on your iOS version." %}</li>
+            <li>{% trans "Confirm removal." %}</li>
+          `;
+                    uninstallModal.show();
+                });
+            }
+        } else {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                updateInstallButtonVisibility();
+            });
+
+            if (installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    if (!deferredPrompt) return;
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response to install: ${outcome}`);
+                    deferredPrompt = null;
+                    updateInstallButtonVisibility();
+                });
+            }
+
+            if (uninstallBtn && uninstallModal) {
+                uninstallBtn.addEventListener('click', () => {
+                    // Android / Desktop uninstall instructions
+                    const instr = document.getElementById('uninstallInstructions');
+                    const steps = document.getElementById('uninstallSteps');
+                    instr.textContent = `{% trans "To remove the app/shortcut, follow the steps for your platform:" %}`;
+                    steps.innerHTML = `
+                  <li>{% trans "Android: Long-press the app icon and choose 'Uninstall' or drag to 'Remove' depending on launcher." %}</li>
+                  <li>{% trans "iOS: Long-press the shortcut and tap 'Remove Bookmark' (if added as bookmark)." %}</li>
+                  <li>{% trans "Desktop: Right-click the shortcut and choose 'Delete' or go to your browser's install management to remove." %}</li>
+                `;
+                    uninstallModal.show();
+                });
+            }
+
+            window.addEventListener('appinstalled', () => {
+                console.log('App installed.');
+                deferredPrompt = null;
+                updateInstallButtonVisibility();
+            });
+        }
+
+        // Re-evaluate visibility when user returns, page shown, or mode may have changed (e.g., after uninstall)
+        window.addEventListener('visibilitychange', updateInstallButtonVisibility);
+        window.addEventListener('pageshow', updateInstallButtonVisibility);
+        window.addEventListener('resize', updateInstallButtonVisibility);
+        window.addEventListener('orientationchange', updateInstallButtonVisibility);
+    });
+</script>
+
+{% endblock content %}

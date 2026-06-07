@@ -1,0 +1,167 @@
+{% extends "webapp/base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div style="margin-bottom: 1.5rem;">
+    <a href="{% url 'owner_dashboard' %}" style="text-decoration: none;">
+        <button class="btn btn-secondary" style="font-weight: 600;">
+            <i class="fa fa-arrow-left"></i> {% trans "Back to Dashboard" %}
+        </button>
+    </a>
+</div>
+
+<div
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 1rem;">
+    <h4 style="color: var(--text-primary); font-weight: 600; margin: 0;">{% trans "All Customers" %}</h4>
+    <a href="{% url 'admin_create_customer' %}" class="btn btn-primary" style="font-weight: 600;">
+        <i class="fa fa-plus-circle"></i> {% trans "Add New Customer" %}
+    </a>
+</div>
+<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">{% trans "View and manage all customers across the organization" %}</p>
+<hr style="border: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card"
+            style="background-color: var(--secondary-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--gold-accent);">
+            <div class="card-body" style="padding: 1.25rem;">
+                <h6 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">{% trans "Total Customers" %}</h6>
+                <h3 style="color: var(--gold-accent); margin: 0; font-weight: 700;">{{ total_customers }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'final_agreement_list' %}"
+            style="text-decoration: none; display: block; transition: transform 0.2s;"
+            onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';"
+            title='{% trans "Click to view details" %}'>
+            <div class="card"
+                style="background-color: var(--secondary-bg); border: 1px solid var(--border-color); border-left: 4px solid #28a745; cursor: pointer;">
+                <div class="card-body" style="padding: 1.25rem;">
+                    <h6 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">{% trans "Final Agreement" %}</h6>
+                    <h3 style="color: #28a745; margin: 0; font-weight: 700;">{{ contracts_signed }}</h3>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'in_progress_list' %}"
+            style="text-decoration: none; display: block; transition: transform 0.2s;"
+            onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';"
+            title='{% trans "Click to view details" %}'>
+            <div class="card"
+                style="background-color: var(--secondary-bg); border: 1px solid var(--border-color); border-left: 4px solid #17a2b8; cursor: pointer;">
+                <div class="card-body" style="padding: 1.25rem;">
+                    <h6 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">{% trans "In Progress" %}</h6>
+                    <h3 style="color: #17a2b8; margin: 0; font-weight: 700;">{{ in_progress }}</h3>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'danger_zone_list' %}"
+            style="text-decoration: none; display: block; transition: transform 0.2s;"
+            onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';"
+            title='{% trans "Click to view details" %}'>
+            <div class="card"
+                style="background-color: var(--secondary-bg); border: 1px solid var(--border-color); border-left: 4px solid #dc3545; cursor: pointer;">
+                <div class="card-body" style="padding: 1.25rem;">
+                    <h6 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">{% trans "Red Zone (2w+)" %}</h6>
+                    <h3 style="color: #dc3545; margin: 0; font-weight: 700;">{{ danger_zone }}</h3>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+{% include "webapp/alerts.html" %}
+
+<div class="card" style="background-color: var(--secondary-bg); border: 1px solid var(--border-color);">
+    <div class="card-header"
+        style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+        <h5 style="margin: 0; font-weight: 600;">{% trans "Full Customers List" %}</h5>
+    </div>
+    <div class="card-body" style="padding: 0; overflow-x: auto;">
+        {% if customers %}
+        <table class="table" style="margin: 0; color: var(--text-primary);">
+            <thead style="background-color: rgba(201, 168, 76, 0.15); border-bottom: 2px solid var(--gold-accent);">
+                <tr>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Customer Name" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Phone" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Sales" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Type" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Stage" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Added On" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Actions" %}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr class="{% cycle 'row-primary' 'row-secondary' %}"
+                    style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 1rem; color: var(--text-primary);">
+                        <strong>{{ customer.first_name }} {{ customer.last_name }}</strong>
+                    </td>
+                    <td style="padding: 1rem; vertical-align: middle;">
+                        <a href="https://wa.me/{{ customer.phone|cut:' ' }}" target="_blank"
+                            class="btn btn-sm btn-success"
+                            style="display: inline-flex; align-items: center; gap: 0.25rem; background-color: #25D366; border-color: #25D366;">
+                            <i class="fa fa-whatsapp"></i> <bdi dir="ltr">{{ customer.phone }}</bdi>
+                        </a>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <span style="color: var(--text-primary);">{{ customer.sales_rep.username }}</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <span class="badge"
+                            style="background-color: {% if customer.customer_type == 'special' %}rgba(255, 193, 7, 0.3); color: #ffc107{% else %}rgba(108, 117, 125, 0.3); color: #6c757d{% endif %}; display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px;">
+                            {% if customer.customer_type == 'special' %}⭐ {% trans "Special" %}{% else %}{% trans "Standard" %}{% endif %}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <span class="badge"
+                            style="background-color: rgba(201, 168, 76, 0.3); color: var(--gold-accent); display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px;">
+                            {{ customer.get_current_stage_display }}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem; color: var(--text-secondary);">
+                        {{ customer.created_at|date:"M d, Y" }}
+                    </td>
+                    <td style="padding: 1rem;">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <a href="{% url 'view_customer' customer.id %}" class="btn btn-sm btn-info"
+                                title='{% trans "View" %}'><i class="fa fa-eye"></i> {% trans "View" %}</a>
+                            <a href="{% url 'update_customer' customer.id %}" class="btn btn-sm btn-warning"
+                                title='{% trans "Edit" %}'><i class="fa fa-edit"></i> {% trans "Edit" %}</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+            <i class="fa fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+            {% trans "No customers found in the system." %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,66 @@
+The requirements:
+python is installed
+
+
+
+steps:
+1. Open the terminal
+
+2. Run
+cd crm
+ 
+3. Run
+py -m venv env
+
+4. Run
+env\Scripts\activate
+
+5. Run
+pip install -r requirements.txt
+
+6.Run:
+py manage.py compilemessages
+
+7. Run the server:
+py manage.py runserver
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Create a new Owner/Admin:
+py manage.py createsuperuser
+
+
+translation:
+py manage.py makemessages -l ar --keep-pot
+py manage.py compilemessages
+
+
+delete all data:
+python manage.py flush
+
+
+rmdir /s /q env
+
+
+py manage.py shell
+
+
+
+
+Admin:
+Mina_nagy
+owner123

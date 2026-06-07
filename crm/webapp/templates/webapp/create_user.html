@@ -1,0 +1,88 @@
+{% extends "webapp/base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block content %}
+
+<div style="margin-bottom: 1.5rem;">
+    {% if is_team_leader %}
+    <a href="{% url 'team_leader_dashboard' %}" style="text-decoration: none;">
+        <button class="btn btn-secondary" style="font-weight: 600;">
+            <i class="fa fa-arrow-left"></i> {% trans "Back to Dashboard" %}
+        </button>
+    </a>
+    {% elif role_param == 'team_leader' %}
+    <a href="{% url 'team_leaders_list' %}" style="text-decoration: none;">
+        <button class="btn btn-secondary" style="font-weight: 600;">
+            <i class="fa fa-arrow-left"></i> {% trans "Back to Team Leaders" %}
+        </button>
+    </a>
+    {% else %}
+    <a href="{% url 'sales_reps_list' %}" style="text-decoration: none;">
+        <button class="btn btn-secondary" style="font-weight: 600;">
+            <i class="fa fa-arrow-left"></i> {% trans "Back to Sales Representatives" %}
+        </button>
+    </a>
+    {% endif %}
+</div>
+
+<div class="container" style="max-width: 600px; margin: 2rem auto;">
+    <div class="card" style="background-color: var(--secondary-bg); border: 1px solid var(--border-color);">
+        <div class="card-header"
+            style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+            <h3 style="margin: 0; font-weight: 600;">{{ title }}</h3>
+            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">{% trans "Directly add a new member to the system" %}</p>
+        </div>
+        <div class="card-body" style="padding: 2rem;">
+
+            {% include "webapp/alerts.html" %}
+
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form.username|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form.phone|as_crispy_field }}
+                    </div>
+                </div>
+
+                <fieldset class="form-group"
+                    style="margin: 1.5rem 0; padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 8px; background-color: rgba(201, 168, 76, 0.05);">
+                    <legend
+                        style="border-bottom: 2px solid var(--gold-accent); padding-bottom: 0.75rem; color: var(--gold-accent); margin-bottom: 1rem; width: 100%; font-weight: 600;">
+                        {% trans "User Role" %}</legend>
+                    {% if is_team_leader %}
+                    <p style="color: var(--text-secondary); margin: 0;">{% trans "Sales Representative" %}</p>
+                    <input type="hidden" name="role" value="sales">
+                    {% else %}
+                    {{ form.role }}
+                    {% endif %}
+                </fieldset>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.password1|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.password2|as_crispy_field }}
+                    </div>
+                </div>
+
+                <br>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary w-100 p-2" style="font-weight: 600; font-size: 1rem;">
+                        <i class="fa fa-user-plus" aria-hidden="true"></i> &nbsp; {% trans "Create User" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

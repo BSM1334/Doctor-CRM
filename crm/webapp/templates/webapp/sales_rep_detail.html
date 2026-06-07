@@ -1,0 +1,162 @@
+{% extends "webapp/base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div style="margin-bottom: 1.5rem;">
+    {% if from_leader %}
+    <a href="{% url 'team_leader_detail' from_leader %}" style="text-decoration: none;">
+        <button class="btn btn-secondary" style="font-weight: 600;">
+            <i class="fa fa-arrow-left"></i> {% trans "Back to Team Leader" %}
+        </button>
+    </a>
+    {% else %}
+    <a href="{% url 'sales_reps_list' %}" style="text-decoration: none;">
+        <button class="btn btn-secondary" style="font-weight: 600;">
+            <i class="fa fa-arrow-left"></i> {% trans "Back to Sales Representatives" %}
+        </button>
+    </a>
+    {% endif %}
+</div>
+
+<div class="card"
+    style="background-color: var(--secondary-bg); border: 1px solid var(--border-color); margin-bottom: 2rem;">
+    <div class="card-header"
+        style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h5 style="margin: 0; font-weight: 600;">{% trans "Sales Representative Details" %}</h5>
+            <div style="display: flex; gap: 0.5rem;">
+                {% if request.user.user_role.role == 'owner' %}
+                <a href="{% url 'edit_user' sales_user.id %}" class="btn btn-sm btn-warning">
+                    <i class="fa fa-edit"></i> {% trans "Edit" %}
+                </a>
+                <a href="{% url 'reset_password' sales_user.id %}" class="btn btn-sm btn-secondary">
+                    <i class="fa fa-key"></i> {% trans "Reset Password" %}
+                </a>
+                <a href="{% url 'delete_user' sales_user.id %}?next=sales_rep_detail" class="btn btn-sm btn-danger">
+                    <i class="fa fa-trash"></i> {% trans "Delete" %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-body" style="padding: 2rem;">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="color: var(--text-secondary); font-weight: 600;">{% trans "Name:" %}</div>
+                    <div style="color: var(--text-primary);">{{ sales_user.username }}</div>
+
+                    <div style="color: var(--text-secondary); font-weight: 600;">{% trans "Phone:" %}</div>
+                    <div style="color: var(--text-primary);">
+                        {% if sales_role.phone %}
+                        <a href="https://wa.me/{{ sales_role.phone|cut:' ' }}" target="_blank"
+                            class="btn btn-sm btn-success"
+                            style="display: inline-flex; align-items: center; gap: 0.25rem; background-color: #25D366; border-color: #25D366;">
+                            <i class="fa fa-whatsapp"></i> <bdi dir="ltr">{{ sales_role.phone }}</bdi>
+                        </a>
+                        {% else %}
+                        <span style="color: var(--text-secondary);">{% trans "No phone" %}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="color: var(--text-secondary); font-weight: 600;">{% trans "Team Leader:" %}</div>
+                    <div style="color: var(--text-primary);">
+                        {% if sales_user.team_leader_mapping.team_leader %}
+                        <a href="{% url 'team_leader_detail' sales_user.team_leader_mapping.team_leader.id %}"
+                            style="color: var(--gold-accent); text-decoration: none; font-weight: 600;">
+                            {{ sales_user.team_leader_mapping.team_leader.username }}
+                            <i class="fa fa-external-link" style="font-size: 0.8rem;"></i>
+                        </a>
+                        {% else %}
+                        <span class="badge"
+                            style="background-color: rgba(255, 193, 7, 0.3); color: #ffc107; display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px;">{% trans "Unassigned" %}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">{% trans "Customers" %}</h4>
+
+<div class="card" style="background-color: var(--secondary-bg); border: 1px solid var(--border-color);">
+    <div class="card-header"
+        style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+        <h5 style="margin: 0; font-weight: 600;">
+            <i class="fa fa-users"></i> {% trans "Total Customers:" %} <span style="color: #17a2b8;">{{ customers.count }}</span>
+        </h5>
+    </div>
+    <div class="card-body" style="padding: 0; overflow-x: auto;">
+        {% if customers %}
+        <table class="table" style="margin: 0; color: var(--text-primary);">
+            <thead style="background-color: rgba(201, 168, 76, 0.15); border-bottom: 2px solid var(--gold-accent);">
+                <tr>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Name" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Phone" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Current Stage" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Days in Stage" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Actions" %}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr class="{% cycle 'row-primary' 'row-secondary' %}"
+                    style="border-bottom: 1px solid var(--border-color); {% if customer.is_in_danger_zone %}background-color: rgba(220, 53, 69, 0.1);{% endif %}">
+                    <td style="padding: 1rem; color: var(--text-primary);">
+                        <strong>{{ customer.first_name }} {{ customer.last_name }}</strong>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <a href="https://wa.me/{{ customer.phone|cut:' ' }}" target="_blank"
+                            class="btn btn-sm btn-success"
+                            style="display: inline-flex; align-items: center; gap: 0.25rem; background-color: #25D366; border-color: #25D366;">
+                            <i class="fa fa-whatsapp"></i> <bdi dir="ltr">{{ customer.phone }}</bdi>
+                        </a>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <span class="badge"
+                            style="background-color: rgba(201, 168, 76, 0.3); color: var(--gold-accent); display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px;">
+                            {{ customer.get_current_stage_display }}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem;">
+                        {% if customer.is_in_danger_zone %}
+                        <span style="color: #dc3545; font-weight: 600;">
+                            <i class="fa fa-warning"></i> {% blocktrans count count=customer.days_in_current_stage %}{{ count }} day{% plural %}{{ count }} days{% endblocktrans %}
+                        </span>
+                        {% else %}
+                        <span style="color: #28a745;">{% blocktrans count count=customer.days_in_current_stage %}{{ count }} day{% plural %}{{ count }} days{% endblocktrans %}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">
+                        <a href="{% url 'view_customer' customer.id %}?from_sales_rep={{ sales_user.id }}" class="btn btn-sm btn-info" title='{% trans "View" %}'><i
+                                class="fa fa-eye"></i> {% trans "View" %}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+            <i class="fa fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+            {% trans "No customers found." %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock content %}

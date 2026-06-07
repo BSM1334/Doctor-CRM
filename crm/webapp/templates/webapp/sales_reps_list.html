@@ -1,0 +1,126 @@
+{% extends "webapp/base.html" %}
+{% load i18n permission_tags %}
+
+{% block content %}
+
+<div style="margin-bottom: 1.5rem;">
+    <a href="{% url 'owner_dashboard' %}" style="text-decoration: none;">
+        <button class="btn btn-secondary" style="font-weight: 600;">
+            <i class="fa fa-arrow-left"></i> {% trans "Back to Dashboard" %}
+        </button>
+    </a>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+    <h4 style="color: var(--text-primary); font-weight: 600; margin: 0;">{% trans "Sales Representatives" %}</h4>
+    <a href="{% url 'create_user' %}?role=sales" class="btn btn-primary" style="font-weight: 600;">
+        <i class="fa fa-user-plus"></i> {% trans "Add Sales" %}
+    </a>
+</div>
+<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">{% trans "Manage and view all sales representatives" %}
+</p>
+
+<hr style="border: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+{% include "webapp/alerts.html" %}
+
+<div class="card" style="background-color: var(--secondary-bg); border: 1px solid var(--border-color);">
+    <div class="card-header"
+        style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+        <h5 style="margin: 0; font-weight: 600;">{% trans "Sales Representatives List" %}</h5>
+    </div>
+    <div class="card-body" style="padding: 0; overflow-x: auto;">
+        {% if sales_reps %}
+        <table class="table" style="margin: 0; color: var(--text-primary);">
+            <thead style="background-color: rgba(201, 168, 76, 0.15); border-bottom: 2px solid var(--gold-accent);">
+                <tr>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Name" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Phone" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Team Leader" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Actions" %}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user_role in sales_reps %}
+                <tr class="{% cycle 'row-primary' 'row-secondary' %}"
+                    style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 1rem; color: var(--text-primary);">
+                        <a href="{% url 'sales_rep_detail' user_role.user.id %}"
+                            style="color: var(--gold-accent); text-decoration: none;">
+                            <strong>{{ user_role.user.username }}</strong>
+                            <i class="fa fa-external-link" style="font-size: 0.8rem;"></i>
+                        </a>
+                    </td>
+                    <td style="padding: 1rem; vertical-align: middle;">
+                        {% if user_role.phone %}
+                        <a href="https://wa.me/{{ user_role.phone|cut:' ' }}" target="_blank"
+                            class="btn btn-sm btn-success"
+                            style="display: inline-flex; align-items: center; gap: 0.25rem; margin-left: 0.5rem; background-color: #25D366; border-color: #25D366;">
+                            <i class="fa fa-whatsapp"></i> <bdi dir="ltr">{{ user_role.phone }}</bdi>
+                        </a>
+                        {% else %}
+                        <span style="color: var(--text-secondary);">{% trans "No phone" %}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">
+                        {% if user_role.user.team_leader_mapping.team_leader %}
+                        <span style="color: var(--text-primary);">{{ user_role.user.team_leader_mapping.team_leader.username }}</span>
+                        {% else %}
+                        <span class="badge"
+                            style="background-color: rgba(255, 193, 7, 0.3); color: #ffc107; display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px;">{% trans "Unassigned" %}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <a href="{% url 'sales_rep_detail' user_role.user.id %}" class="btn btn-sm btn-info"
+                                title='{% trans "View" %}'><i class="fa fa-eye"></i> {% trans "View" %}</a>
+
+                            {% if request.user.user_role.role == 'owner' %}
+                            <a href="{% url 'edit_user' user_role.user.id %}" class="btn btn-sm btn-warning"
+                                title='{% trans "Edit" %}'><i class="fa fa-edit"></i> {% trans "Edit" %}</a>
+                            <a href="{% url 'reset_password' user_role.user.id %}" class="btn btn-sm btn-secondary"
+                                title='{% trans "Reset Password" %}'><i class="fa fa-key"></i> {% trans "Reset" %}</a>
+                            <a href="{% url 'manage_permissions' user_role.user.id %}" class="btn btn-sm btn-warning"
+                                title='{% trans "Permissions" %}'><i class="fa fa-shield"></i> {% trans "Permissions" %}</a>
+                            <a href="{% url 'delete_user' user_role.user.id %}?next=sales_rep_detail"
+                                class="btn btn-sm btn-danger" title='{% trans "Delete" %}'><i class="fa fa-trash"></i>
+                                {% trans "Delete" %}</a>
+                            {% else %}
+                            {% if request.user|has_permission:'edit' %}
+                            <a href="{% url 'edit_user' user_role.user.id %}" class="btn btn-sm btn-warning"
+                                title='{% trans "Edit" %}'><i class="fa fa-edit"></i> {% trans "Edit" %}</a>
+                            {% endif %}
+                            {% if request.user|has_permission:'reset_password' %}
+                            <a href="{% url 'reset_password' user_role.user.id %}" class="btn btn-sm btn-secondary"
+                                title='{% trans "Reset Password" %}'><i class="fa fa-key"></i> {% trans "Reset" %}</a>
+                            {% endif %}
+                            {% if request.user|has_permission:'delete' %}
+                            <a href="{% url 'delete_user' user_role.user.id %}?next=sales_rep_detail"
+                                class="btn btn-sm btn-danger" title='{% trans "Delete" %}'><i class="fa fa-trash"></i>
+                                {% trans "Delete" %}</a>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+            <i class="fa fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+            {% trans "No sales representatives found." %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock content %}

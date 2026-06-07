@@ -1,0 +1,225 @@
+{% extends "webapp/base.html" %}
+{% load i18n permission_tags %}
+
+{% block content %}
+
+<h4 style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem;">{% blocktrans with username=user.username %}Welcome, {{ username }}! 👋{% endblocktrans %}</h4>
+{% if team_number %}
+<p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>{% trans "Team Number" %}:</strong> <span
+        dir="ltr" style="display:inline-block;">{{ team_number }}</span></p>
+{% endif %}
+<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">{% trans "Team Leader Dashboard - Real Estate Management" %}</p>
+
+<hr style="border: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+{% include "webapp/alerts.html" %}
+
+<!-- Team Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card"
+            style="background-color: var(--secondary-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--gold-accent);">
+            <div class="card-body">
+                <h5 class="card-title"
+                    style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem;">
+                    {% trans "Team Sales Representatives" %}</h5>
+                <h2 class="card-text" style="color: var(--gold-accent); margin: 0; font-weight: 700;">{{ team_size }}
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card"
+            style="background-color: var(--secondary-bg); border: 1px solid var(--border-color); border-left: 4px solid #28a745;">
+            <div class="card-body">
+                <h5 class="card-title"
+                    style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem;">
+                    {% trans "Total Team Customers" %}</h5>
+                <h2 class="card-text" style="color: #28a745; margin: 0; font-weight: 700;">{{ total_team_customers }}
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card"
+            style="background-color: var(--secondary-bg); border: 1px solid var(--border-color); border-left: 4px solid #17a2b8;">
+            <div class="card-body">
+                <h5 class="card-title"
+                    style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem;">
+                    {% trans "Contracts Signed by Team" %}</h5>
+                <h2 class="card-text" style="color: #17a2b8; margin: 0; font-weight: 700;">{{ total_team_contracts }}
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr style="border: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+<div class="mb-4">
+    <a class="btn btn-primary" href="{% url 'create_user' %}"
+        style="display: inline-flex; align-items: center; gap: 0.5rem;">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> {% trans "Add New Member" %}
+    </a>
+</div>
+
+<!-- Sales Team Table -->
+<!-- Action Buttons -->
+
+<h5 class="mb-3" style="color: var(--text-primary); font-weight: 600;">{% trans "Your Sales Team" %}</h5>
+<div class="card" style="background-color: var(--secondary-bg); border: 1px solid var(--border-color);">
+    <div class="card-header"
+        style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+        <h5 style="margin: 0; font-weight: 600;">{% trans "Team Members List" %}</h5>
+    </div>
+    <div class="card-body" style="padding: 0; overflow-x: auto;">
+        {% if sales_reps %}
+        <table class="table" style="margin: 0; color: var(--text-primary);">
+            <thead style="background-color: rgba(201, 168, 76, 0.15); border-bottom: 2px solid var(--gold-accent);">
+                <tr>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Name" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Phone" %}
+                    </th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">
+                        {% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_role in sales_reps %}
+                    <tr class="{% cycle 'row-primary' 'row-secondary' %}"
+                    style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 1rem; color: var(--text-primary);">
+                        <a href="{% url 'sales_rep_detail' user_role.user.id %}"
+                        style="color: var(--gold-accent); text-decoration: none;">
+                        <strong>{{ user_role.user.username }}</strong>
+                        <i class="fa fa-external-link" style="font-size: 0.8rem;"></i>
+                    </a>
+                </td>
+                <td style="padding: 1rem; vertical-align: middle;">
+                    {% if user_role.phone %}
+                    <a href="https://wa.me/{{ user_role.phone|cut:' ' }}" target="_blank"
+                    class="btn btn-sm btn-success"
+                    style="display: inline-flex; align-items: center; gap: 0.25rem; margin-left: 0.5rem; background-color: #25D366; border-color: #25D366;">
+                    <i class="fa fa-whatsapp"></i> <bdi dir="ltr">{{ user_role.phone }}</bdi>
+                </a>
+                {% else %}
+                <span style="color: var(--text-secondary);">{% trans "No phone" %}</span>
+                {% endif %}
+            </td>
+            <td style="padding: 1rem;">
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <a href="{% url 'sales_rep_detail' user_role.user.id %}" class="btn btn-sm btn-info"
+                    title='{% trans "View" %}'><i class="fa fa-eye"></i> {% trans "View Performance" %}</a>
+                    
+                    {% if request.user|has_permission:'edit' %}
+                    <a href="{% url 'edit_user' user_role.user.id %}" class="btn btn-sm btn-warning"
+                    title='{% trans "Edit" %}'><i class="fa fa-edit"></i> {% trans "Edit" %}</a>
+                    {% endif %}
+                    
+                    {% if request.user|has_permission:'reset_password' %}
+                    <a href="{% url 'reset_password' user_role.user.id %}" class="btn btn-sm btn-secondary"
+                    title='{% trans "Reset Password" %}'><i class="fa fa-key"></i> {% trans "Reset" %}</a>
+                    {% endif %}
+                    
+                    {% if request.user|has_permission:'delete' %}
+                    <a href="{% url 'delete_user' user_role.user.id %}?next=sales_rep_detail"
+                    class="btn btn-sm btn-danger" title='{% trans "Delete" %}'><i class="fa fa-trash"></i>
+                    {% trans "Delete" %}</a>
+                    {% endif %}
+                </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+            <i class="fa fa-users" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+            {% trans "No sales representatives assigned to your team yet." %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<hr style="border: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+<div class="mb-4">
+    <a class="btn btn-primary" href="{% url 'create_customer' %}"
+        style="display: inline-flex; align-items: center; gap: 0.5rem;">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> {% trans "Add New Customer" %}
+    </a>
+</div>
+
+<h5 class="mb-3" style="color: var(--text-primary); font-weight: 600;">{% trans "Your Added Customers" %}</h5>
+<div class="card"
+    style="background-color: var(--secondary-bg); border: 1px solid var(--border-color); margin-bottom: 2rem;">
+    <div class="card-body" style="padding: 0; overflow-x: auto;">
+        <table class="table" style="margin: 0; color: var(--text-primary);">
+            <thead style="background-color: rgba(201, 168, 76, 0.15); border-bottom: 2px solid var(--gold-accent);">
+                <tr>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans "Name" %}</th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans "Phone" %}</th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans "Request" %}</th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans "Stage" %}</th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans "Days in Stage" %}</th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans "Status" %}</th>
+                    <th scope="col" style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if own_customers %}
+                {% for customer in own_customers %}
+                <tr
+                    style="background-color: {% cycle 'var(--secondary-bg)' 'var(--tertiary-bg)' %}; border-bottom: 1px solid var(--border-color); transition: all 0.3s ease;">
+                    <td style="padding: 1rem; color: var(--text-primary); vertical-align: middle;">{{ customer.first_name }} {{ customer.last_name }}</td>
+                    <td style="padding: 1rem; vertical-align: middle;">
+                        <a href="{{ customer.whatsapp_link }}" target="_blank" class="btn btn-sm btn-success"
+                            style="display: inline-flex; align-items: center; gap: 0.25rem; margin-left: 0.5rem; background-color: #25D366; border-color: #25D366;">
+                            <i class="fa fa-whatsapp"></i> <bdi dir="ltr">{{ customer.phone }}</bdi>
+                        </a>
+                    </td>
+                    <td
+                        style="padding: 1rem; color: var(--text-secondary); max-width: 300px; white-space: normal; word-wrap: break-word; vertical-align: middle;">
+                        {{ customer.request|truncatewords:30 }}</td>
+                    <td style="padding: 1rem; vertical-align: middle;">
+                        <span class="badge"
+                            style="background-color: rgba(201, 168, 76, 0.3); color: var(--gold-accent); display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px; font-weight: 600;">{{ customer.get_current_stage_display }}</span>
+                    </td>
+                    <td style="padding: 1rem; color: var(--text-primary); vertical-align: middle;">{% blocktrans count days=customer.days_in_current_stage %}{{ days }} day{% plural %}{{ days }} days{% endblocktrans %}</td>
+                    <td style="padding: 1rem; vertical-align: middle;">
+                        {% if customer.is_in_danger_zone %}
+                        <span
+                            style="background-color: rgba(220, 53, 69, 0.3); color: #dc3545; display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px; font-weight: 600;">🔴
+                            {% trans "Overdue" %}</span>
+                        {% else %}
+                        <span
+                            style="background-color: rgba(40, 167, 69, 0.3); color: #28a745; display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px; font-weight: 600;">🟢
+                            {% trans "On Track" %}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem; vertical-align: middle;">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <a href="{% url 'view_customer' customer.id %}" class="btn btn-sm btn-primary"><i
+                                    class="fa fa-eye"></i> {% trans "View" %}</a>
+                            <a href="{% url 'update_customer' customer.id %}" class="btn btn-sm btn-warning"><i
+                                    class="fa fa-edit"></i> {% trans "Edit" %}</a>
+                            <a href="{% url 'delete_customer' customer.id %}" class="btn btn-sm btn-danger"><i
+                                    class="fa fa-trash"></i> {% trans "Delete" %}</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr style="background-color: var(--secondary-bg); border-bottom: 1px solid var(--border-color);">
+                    <td colspan="7" class="text-center" style="padding: 2rem; color: var(--text-secondary);">{% trans "You have not added any customers yet." %}</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock content %}

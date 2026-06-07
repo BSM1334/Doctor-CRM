@@ -1,0 +1,36 @@
+{% extends "webapp/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 2rem auto;">
+    <div class="card" style="background-color: var(--secondary-bg); border: 1px solid var(--border-color);">
+        <div class="card-header" style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+            <h5 style="margin: 0; font-weight: 600;">{% trans "Manage Permissions" %} — {{ target_user.username }}</h5>
+        </div>
+        <div class="card-body" style="padding: 2rem;">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.META.HTTP_REFERER }}">
+                
+                {% for perm in all_permissions %}
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="permissions" value="{{ perm }}" id="perm_{{ perm }}"
+                        {% if perm in current_permissions %}checked{% endif %}>
+                    <label class="form-check-label" for="perm_{{ perm }}" style="color: var(--text-primary); font-weight: 500;">
+                        {% if perm == 'edit' %}✏️ {% trans "Edit" %}
+                        {% elif perm == 'reset_password' %}🔑 {% trans "Reset Password" %}
+                        {% elif perm == 'delete' %}🗑️ {% trans "Delete" %}
+                        {% endif %}
+                    </label>
+                </div>
+                {% endfor %}
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary">{% trans "Save Permissions" %}</button>
+                    <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

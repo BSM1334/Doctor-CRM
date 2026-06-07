@@ -1,0 +1,25 @@
+<div class="message-container" style="text-align: center;">
+    {% if messages %}
+    {% for message in messages %}
+    <div id="message-{{ forloop.counter }}" class="container alert-message" style="margin-bottom: 1rem;">
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert" style="margin-top: 1rem; border-radius: 8px;">
+            <h5 style="margin: 0;"><strong>{{ message }}</strong></h5>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+<script>
+    setTimeout(function () {
+        var messages = document.querySelectorAll('.alert-message');
+        messages.forEach(function (msg) {
+            msg.style.opacity = '1';
+            msg.style.transition = 'opacity 0.6s ease-out';
+            msg.style.opacity = '0';
+            setTimeout(function () {
+                msg.style.display = 'none';
+            }, 600);
+        });
+    }, 3000);
+</script>

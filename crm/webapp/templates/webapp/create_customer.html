@@ -1,0 +1,107 @@
+{% extends "webapp/base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container" style="max-width: 800px; margin: 2rem auto;">
+    <div class="card" style="background-color: var(--secondary-bg); border: 1px solid var(--border-color);">
+        <div class="card-header"
+            style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+            <h3 style="margin: 0; font-weight: 600;">{% trans "Add New Member" %}</h3>
+            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">{% trans "Register a new client in the system" %}</p>
+        </div>
+        <div class="card-body" style="padding: 2rem;">
+
+            {% include "webapp/alerts.html" %}
+
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.first_name|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.last_name|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.phone|as_crispy_field }}
+                        <small class="form-text" style="color: var(--text-secondary);">{% trans "Phone number must be unique" %}</small>
+                    </div>
+                    <div class="col-md-6">
+                        {% if 'sales_rep' in form.fields %}
+                        {{ form.sales_rep|as_crispy_field }}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="customer_type" class="form-label">{% trans "Customer Type" %}</label>
+                            <select name="customer_type" id="customer_type" class="form-select" style="background-color: var(--tertiary-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                                <option value="standard" selected>{% trans "Standard" %}</option>
+                                <option value="special">{% trans "Special" %}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.current_stage|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.days_in_stage|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label class="form-label">{% trans "Status Preview" %}</label>
+                            <div id="status_preview" class="form-control"
+                                style="background-color: rgba(40, 167, 69, 0.1); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.3);;">
+                                🟢 {% trans "On Track" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{ form.request|as_crispy_field }}
+
+                <br>
+
+                <div class="text-center" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button type="submit" class="btn btn-primary" style="min-width: 150px;">
+                        <i class="fa fa-plus" aria-hidden="true"></i> &nbsp; {% trans "Add Customer" %}
+                    </button>
+                    <a href="{% url dashboard_url_name %}" class="btn btn-secondary" style="min-width: 150px;">
+                        <i class="fa fa-times" aria-hidden="true"></i> &nbsp; {% trans "Cancel" %}
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('id_days_in_stage').addEventListener('input', function () {
+        const days = parseInt(this.value) || 0;
+        const preview = document.getElementById('status_preview');
+
+        if (days > 14) {
+            preview.style.backgroundColor = 'rgba(220, 53, 69, 0.1)';
+            preview.style.color = '#dc3545';
+            preview.style.borderColor = 'rgba(220, 53, 69, 0.3)';
+            preview.innerHTML = '🔴 {% trans "Overdue" %}';
+        } else {
+            preview.style.backgroundColor = 'rgba(40, 167, 69, 0.1)';
+            preview.style.color = '#28a745';
+            preview.style.borderColor = 'rgba(40, 167, 69, 0.3)';
+            preview.innerHTML = '🟢 {% trans "On Track" %}';
+        }
+    });
+</script>
+
+{% endblock content %}

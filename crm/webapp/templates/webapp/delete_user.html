@@ -1,0 +1,78 @@
+{% extends "webapp/base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="container" style="max-width: 600px; margin: 2rem auto;">
+    <div class="card"
+        style="background-color: var(--secondary-bg); border: 2px solid var(--border-color); border-left: 4px solid #dc3545;">
+        <div class="card-header"
+            style="background-color: rgba(220, 53, 69, 0.1); border-bottom: 2px solid #dc3545; color: #dc3545;">
+            <h3 style="margin: 0; font-weight: 600;"><i class="fa fa-warning"></i> {% trans "Delete User" %}</h3>
+            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">{% trans "This action cannot be undone" %}
+            </p>
+        </div>
+        <div class="card-body" style="padding: 2rem;">
+            <hr style="border: 1px solid var(--border-color); margin: 0 0 1.5rem 0;">
+
+            {% include "webapp/alerts.html" %}
+
+            <div class="alert alert-danger" role="alert"
+                style="background-color: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.5); color: #dc3545; border-radius: 8px;">
+                <h5 style="margin: 0 0 0.5rem 0;"><i class="fa fa-exclamation-circle"></i> {% trans "Confirm Deletion" %}</h5>
+                <p style="margin: 0;">{% blocktrans with username=user_to_delete.username %}Are you sure you want to delete the user {{ username }}?{% endblocktrans %}</p>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">{% trans "This will permanently delete all associated data for this user." %}</p>
+            </div>
+            <div class="user-details"
+                style="background-color: rgba(201, 168, 76, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h6 style="color: var(--gold-accent); font-weight: 600; margin-bottom: 1rem;">{% trans "User Details" %}</h6>
+                <div style="display: grid; grid-template-columns: 150px 1fr; gap: 1rem;">
+                    <div style="color: var(--text-secondary);">{% trans "Username:" %}</div>
+                    <div style="color: var(--text-primary); font-weight: 600;">{{ user_to_delete.username }}</div>
+
+                    <div style="color: var(--text-secondary);">{% trans "Role:" %}</div>
+                    <div style="color: var(--text-primary);">
+                        {% if user_to_delete.user_role %}
+                        <span class="badge"
+                            style="background-color: rgba(201, 168, 76, 0.3); color: var(--gold-accent); display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px;">{{user_to_delete.user_role.get_role_display}}</span>
+                        {% else %}
+                        <span style="color: var(--text-secondary);">{% trans "No role assigned" %}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-danger w-100 p-2"
+                            style="font-weight: 600; font-size: 1rem; margin-bottom: 10px;">
+                            <i class="fa fa-trash" aria-hidden="true"></i> &nbsp; {% trans "Delete User" %}
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        {% if next_page == 'team_leader_detail' %}
+                        <a href="{% url 'team_leaders_list' %}" class="btn btn-secondary w-100 p-2"
+                            style="font-weight: 600; font-size: 1rem;">
+                            <i class="fa fa-times" aria-hidden="true"></i> &nbsp; {% trans "Cancel" %}
+                        </a>
+                        {% elif next_page == 'sales_rep_detail' %}
+                        <a href="{% url 'sales_reps_list' %}" class="btn btn-secondary w-100 p-2"
+                            style="font-weight: 600; font-size: 1rem;">
+                            <i class="fa fa-times" aria-hidden="true"></i> &nbsp; {% trans "Cancel" %}
+                        </a>
+                        {% else %}
+                        <a href="{% url 'owner_dashboard' %}" class="btn btn-secondary w-100 p-2"
+                            style="font-weight: 600; font-size: 1rem;">
+                            <i class="fa fa-times" aria-hidden="true"></i> &nbsp; {% trans "Cancel" %}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

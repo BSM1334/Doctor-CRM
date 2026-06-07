@@ -1,0 +1,107 @@
+{% extends "webapp/base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div style="margin-bottom: 1.5rem;">
+    <a href="{% url 'customers_list' %}" style="text-decoration: none;">
+        <button class="btn btn-secondary" style="font-weight: 600;">
+            <i class="fa fa-arrow-left"></i> {% trans "Back to All Customers" %}
+        </button>
+    </a>
+</div>
+
+<hr style="border: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+{% include "webapp/alerts.html" %}
+
+<div class="card" style="background-color: var(--secondary-bg); border: 1px solid {{ theme_color }};">
+    <div class="card-header"
+        style="background-color: {{ theme_color }} 1a; border-bottom: 2px solid {{ theme_color }}; color: {{ theme_color }};">
+        <div class="card-body" style="padding: 0; overflow-x: auto;">
+            {% if customers %}
+            <table class="table" style="margin: 0; color: var(--text-primary);">
+                <thead style="background-color: {{ theme_color }}26; border-bottom: 2px solid {{ theme_color }};">
+                    <tr>
+                        <th scope="col"
+                            style="color: {{ theme_color }}; font-weight: 600; padding: 1rem; border: none;">
+                            {% trans "Customer Name" %}
+                        </th>
+                        <th scope="col"
+                            style="color: {{ theme_color }}; font-weight: 600; padding: 1rem; border: none;">
+                            {% trans "Phone" %}
+                        </th>
+                        <th scope="col"
+                            style="color: {{ theme_color }}; font-weight: 600; padding: 1rem; border: none;">
+                            {% trans "Request" %}
+                        </th>
+                        <th scope="col"
+                            style="color: {{ theme_color }}; font-weight: 600; padding: 1rem; border: none;">
+                            {% trans "Type" %}
+                        </th>
+                        <th scope="col"
+                            style="color: {{ theme_color }}; font-weight: 600; padding: 1rem; border: none;">
+                            {% trans "Stage" %}
+                        </th>
+                        <th scope="col"
+                            style="color: {{ theme_color }}; font-weight: 600; padding: 1rem; border: none;">
+                            {% trans "Sales Rep" %}
+                        </th>
+                        <th scope="col"
+                            style="color: {{ theme_color }}; font-weight: 600; padding: 1rem; border: none;">
+                            {% trans "Actions" %}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 1rem; color: var(--text-primary);">
+                            <strong>{{ customer.first_name }} {{ customer.last_name }}</strong>
+                        </td>
+                        <td style="padding: 1rem; vertical-align: middle;">
+                            <a href="https://wa.me/{{ customer.phone|cut:' ' }}" target="_blank"
+                                class="btn btn-sm btn-success"
+                                style="display: inline-flex; align-items: center; gap: 0.25rem; background-color: #25D366; border-color: #25D366;">
+                                <i class="fa fa-whatsapp"></i> <bdi dir="ltr">{{ customer.phone }}</bdi>
+                            </a>
+                        </td>
+                        <td style="padding: 1rem; color: var(--text-secondary); max-width: 200px;">
+                            {{ customer.request|truncatechars:80 }}
+                        </td>
+                        <td style="padding: 1rem;">
+                            <span class="badge"
+                                style="background-color: {% if customer.customer_type == 'special' %}rgba(255, 193, 7, 0.3); color: #ffc107{% else %}rgba(108, 117, 125, 0.3); color: #6c757d{% endif %}; display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px;">
+                                {% if customer.customer_type == 'special' %}⭐ {% trans "Special" %}{% else %}{% trans
+                                "Standard" %}{% endif %}
+                            </span>
+                        </td>
+                        <td style="padding: 1rem;">
+                            <span class="badge"
+                                style="background-color: {{ theme_color }}4d; color: {{ theme_color }}; display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px;">
+                                {{ customer.get_current_stage_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 1rem; color: var(--text-primary);">
+                            {{ customer.sales_rep.username }}
+                        </td>
+                        <td style="padding: 1rem;">
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="{% url 'view_customer' customer.id %}" class="btn btn-sm btn-info"
+                                    title='{% trans "View" %}'><i class="fa fa-eye"></i> {% trans "View" %}</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+                <i class="fa fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+                {% trans "No customers found in this category." %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% endblock content %}

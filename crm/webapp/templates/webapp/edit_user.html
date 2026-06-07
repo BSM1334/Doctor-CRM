@@ -1,0 +1,128 @@
+{% extends "webapp/base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block content %}
+
+<style>
+    .text-muted,
+    .form-text {
+        color: #ffffff !important;
+    }
+
+    .asteriskField {
+        display: none !important;
+    }
+</style>
+
+<div class="container" style="max-width: 600px; margin: 2rem auto;">
+    <div class="card" style="background-color: var(--secondary-bg); border: 1px solid var(--border-color);">
+        <div class="card-header"
+            style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+            <h3 style="margin: 0; font-weight: 600;">
+                {% if role == 'sales' %}{% trans "Edit Sales Rep" %}{% elif role == 'team_leader' %}{% trans "Edit Team Leader" %}{% else %}{% trans "Edit User" %}{% endif %}
+            </h3>
+            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">
+                {% if role == 'sales' %}{% trans "Update sales information" %}{% elif role == 'team_leader' %}{% trans "Update team leader information" %}{% else %}{% trans "Update user information" %}{% endif %}
+            </p>
+        </div>
+        <div class="card-body" style="padding: 2rem;">
+
+            {% include "webapp/alerts.html" %}
+
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+
+                {% if role == 'sales' or role == 'team_leader' %}
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        {{ form.username|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        {{ form.phone|as_crispy_field }}
+                        {% if role == 'team_leader' %}
+                        <div style="margin-top: 0.5rem; margin-bottom: 1.5rem;">
+                            <a href="{% url 'downgrade_user' user_to_edit.id %}" class="btn btn-outline-danger btn-sm"
+                                style="font-weight: 600; border-width: 2px;"
+                                onclick="return confirm('{% blocktrans with username=user_to_edit.username|escapejs %}Are you sure you want to downgrade {{ username }} to Sales Rep? Any assigned team members will become unassigned.{% endblocktrans %}');">
+                                <i class="fa fa-level-down"></i> {% trans "Downgrade to Sales" %}
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if role == 'sales' %}
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        {{ form.team_leader|as_crispy_field }}
+                        <div style="margin-top: 0.5rem;">
+                            <a href="{% url 'promote_user' user_to_edit.id %}" class="btn btn-outline-warning btn-sm"
+                                style="font-weight: 600; border-width: 2px;"
+                                onclick="return confirm('{% blocktrans with username=user_to_edit.username|escapejs %}Are you sure you want to promote {{ username }} to Team Leader?{% endblocktrans %}');">
+                                <i class="fa fa-level-up"></i> {% trans "Promote to Team Leader" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% else %}
+                {# Fallback for other roles (Owner/General) #}
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form.username|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.first_name|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.last_name|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form.phone|as_crispy_field }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <br>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-primary w-100 p-2"
+                            style="font-weight: 600; font-size: 1rem;">
+                            <i class="fa fa-save" aria-hidden="true"></i> &nbsp; {% trans "Save Changes" %}
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        {% if role == 'sales' %}
+                        <a href="{% url 'sales_reps_list' %}" class="btn btn-secondary w-100 p-2"
+                            style="font-weight: 600; font-size: 1rem;">
+                            <i class="fa fa-times" aria-hidden="true"></i> &nbsp; {% trans "Cancel" %}
+                        </a>
+                        {% elif role == 'team_leader' %}
+                        <a href="{% url 'team_leaders_list' %}" class="btn btn-secondary w-100 p-2"
+                            style="font-weight: 600; font-size: 1rem;">
+                            <i class="fa fa-times" aria-hidden="true"></i> &nbsp; {% trans "Cancel" %}
+                        </a>
+                        {% else %}
+                        <a href="{% url 'owner_dashboard' %}" class="btn btn-secondary w-100 p-2"
+                            style="font-weight: 600; font-size: 1rem;">
+                            <i class="fa fa-times" aria-hidden="true"></i> &nbsp; {% trans "Cancel" %}
+                        </a>
+                        {% endif %}
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,126 @@
+{% extends "webapp/base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block content %}
+
+<style>
+    .asteriskField {
+        display: none !important;
+    }
+</style>
+
+<div class="container" style="max-width: 800px; margin: 2rem auto;">
+    <div class="card" style="background-color: var(--secondary-bg); border: 1px solid var(--border-color);">
+        <div class="card-header"
+            style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+            <h3 style="margin: 0; font-weight: 600;">{% trans "Add New Customer" %}</h3>
+            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">{% trans "Create a new customer entry with manual stage tracking" %}</p>
+        </div>
+        <div class="card-body" style="padding: 2rem;">
+            <hr style="border: 1px solid var(--border-color); margin: 0 0 1.5rem 0;">
+
+            {% include "webapp/alerts.html" %}
+
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.first_name|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.last_name|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.phone|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="sales_rep" class="form-label">{% trans "Assigned Sales Rep" %} <span
+                                    style="color: #dc3545;">*</span></label>
+                            <select name="sales_rep" id="sales_rep" class="form-select" required
+                                style="background-color: var(--tertiary-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                                <option value="" selected disabled>{% trans "Select a Representative" %}</option>
+                                {% for rep in sales_reps %}
+                                <option value="{{ rep.id }}">{{ rep.username }} ({{ rep.user_role.get_role_display }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="customer_type" class="form-label">{% trans "Customer Type" %}</label>
+                            <select name="customer_type" id="customer_type" class="form-select" style="background-color: var(--tertiary-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                                <option value="standard" selected>{% trans "Standard" %}</option>
+                                <option value="special">{% trans "Special" %}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.current_stage|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.days_in_stage|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label class="form-label">{% trans "Status Preview" %}</label>
+                            <div id="status_preview" class="form-control"
+                                style="background-color: rgba(40, 167, 69, 0.1); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.3);">
+                                🟢 {% trans "On Track" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{ form.request|as_crispy_field }}
+
+                <br>
+
+                <div class="text-center" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button type="submit" class="btn btn-primary" style="min-width: 150px; font-weight: 600;">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i> &nbsp; {% trans "Create Customer" %}
+                    </button>
+                    <a href="{% url 'customers_list' %}" class="btn btn-secondary"
+                        style="min-width: 150px; font-weight: 600;">
+                        <i class="fa fa-times" aria-hidden="true"></i> &nbsp; {% trans "Cancel" %}
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const daysInput = document.getElementById('id_days_in_stage');
+    const statusPreview = document.getElementById('status_preview');
+    const overdueText = '🔴 {% trans "Overdue" %}';
+    const onTrackText = '🟢 {% trans "On Track" %}';
+
+    daysInput.addEventListener('input', function () {
+        const days = parseInt(this.value) || 0;
+        if (days >= 14) {
+            statusPreview.innerHTML = overdueText;
+            statusPreview.style.backgroundColor = 'rgba(220, 53, 69, 0.1)';
+            statusPreview.style.color = '#dc3545';
+            statusPreview.style.borderColor = 'rgba(220, 53, 69, 0.3)';
+        } else {
+            statusPreview.innerHTML = onTrackText;
+            statusPreview.style.backgroundColor = 'rgba(40, 167, 69, 0.1)';
+            statusPreview.style.color = '#28a745';
+            statusPreview.style.borderColor = 'rgba(40, 167, 69, 0.3)';
+        }
+    });
+</script>
+
+{% endblock content %}

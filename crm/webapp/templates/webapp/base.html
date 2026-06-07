@@ -1,0 +1,109 @@
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+<!DOCTYPE html>
+
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}" id="html-root">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Doctor Real State CRM</title>
+    <meta name="description" content="Professional Real Estate CRM - Premium Dark Theme Dashboard">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#c9a84c">
+    <link rel="manifest" href="{% url 'manifest' %}">
+
+    <!-- Google Fonts for Bilingual Support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    {% if LANGUAGE_BIDI %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    {% else %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    {% endif %}
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Dark Theme Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+
+    <!-- Inline Theme Variables -->
+    <style>
+        :root {
+            --primary-bg: #0f0f0f;
+            --secondary-bg: #1a1a1a;
+            --tertiary-bg: #222;
+            --gold-accent: #c9a84c;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --border-color: #333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            --bs-body-bg: #0f0f0f;
+            --bs-body-color: #ffffff;
+        }
+
+        html, body {
+            background-color: #0f0f0f !important;
+            color: #ffffff !important;
+            font-family: {% if LANGUAGE_BIDI %}'Cairo', sans-serif{% else %}'Poppins', sans-serif{% endif %};
+        }
+
+        .text-muted,
+        .form-text {
+            color: #ffffff !important;
+        }
+
+        .asteriskField {
+            display: none !important;
+        }
+    </style>
+
+    <!-- Bootstrap 5 JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</head>
+
+
+<body>
+    {% include "webapp/navbar.html" %}
+
+    <div class="container">
+        <br>
+        {% block content %}
+
+        {% endblock %}
+    </div>
+
+    <!-- App JavaScript for Language Toggle and Utilities -->
+    <script src="{% static 'js/app.js' %}"></script>
+
+    <script>
+            document.querySelectorAll('input[dir="ltr"]').forEach(function(input) {
+            if (document.documentElement.lang === 'ar') {
+                input.style.unicodeBidi = 'bidi-override';
+                input.style.direction = 'rtl';
+            }
+        });
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{% url "service_worker" %}')
+                    .then(reg => console.log('Service worker registered.', reg))
+                    .catch(err => console.log('Service worker registration failed.', err));
+            });
+        }
+    </script>
+
+</body>
+
+
+</html>

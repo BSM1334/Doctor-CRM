@@ -1,0 +1,73 @@
+{% extends "webapp/base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container" style="max-width: 800px; margin: 2rem auto;">
+    <div class="card" style="background-color: var(--secondary-bg); border: 1px solid var(--border-color);">
+        <div class="card-header"
+            style="background-color: rgba(201, 168, 76, 0.1); border-bottom: 2px solid var(--gold-accent); color: var(--gold-accent);">
+            <h3 style="margin: 0; font-weight: 600;">{% trans "Edit Customer Information" %}</h3>
+            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">{% trans "Update customer details" %}</p>
+        </div>
+        <div class="card-body" style="padding: 2rem;">
+            {% include "webapp/alerts.html" %}
+
+
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.first_name|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.last_name|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.phone|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="sales_rep" class="form-label">{% trans "Assigned Sales Rep" %} <span
+                                    style="color: #dc3545;">*</span></label>
+                            <select name="sales_rep" id="sales_rep" class="form-select" required
+                                style="background-color: var(--tertiary-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                                <option value="" selected disabled>{% trans "Select a Representative" %}</option>
+                                {% for rep in sales_reps %}
+                                <option value="{{ rep.id }}" {% if rep.id == customer.sales_rep.id %}selected{% endif %}>{{ rep.username }} ({{ rep.user_role.get_role_display }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form.current_stage|as_crispy_field }}
+                    </div>
+                </div>
+
+
+                {{ form.request|as_crispy_field }}
+
+                <br>
+
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button type="submit" class="btn btn-primary" style="min-width: 150px;">
+                        <i class="fa fa-save" aria-hidden="true"></i> &nbsp; {% trans "Save Changes" %}
+                    </button>
+                    <a href="{% url 'view_customer' customer.id %}" class="btn btn-secondary" style="min-width: 150px;">
+                        <i class="fa fa-times" aria-hidden="true"></i> &nbsp; {% trans "Cancel" %}
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
