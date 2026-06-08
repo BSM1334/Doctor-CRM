@@ -17,9 +17,7 @@
         {% if is_danger %}
         <div class="alert alert-dismissible fade show" role="alert"
             style="background-color: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.5); border-radius: 8px; color: #dc3545; margin-bottom: 1.5rem;">
-            <strong>⚠️ {% trans "Danger Zone!" %}</strong> {% blocktrans with stage=customer.get_current_stage_display
-            days=days_in_stage %}This customer has been in the <strong>{{ stage }}</strong> stage for <strong>{{ days }}
-                days</strong>.{% endblocktrans %}
+            <strong>⚠️ {% trans "Danger Zone!" %}</strong> {% blocktrans with stage=customer.get_current_stage_display days=days_in_stage %}This customer has been in the <strong>{{ stage }}</strong> stage for <strong>{{ days }} days</strong>.{% endblocktrans %}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
                 style="filter: sepia(1) saturate(5) hue-rotate(300deg); opacity: 0.8;"></button>
         </div>
@@ -34,8 +32,7 @@
 
         <div class="row mb-4">
             <div class="col-md-6">
-                <h5 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;"><strong>{% trans "Contact
-                        Information" %}</strong></h5>
+                <h5 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;"><strong>{% trans "Contact Information" %}</strong></h5>
                 <p style="color: var(--text-secondary); margin-bottom: 0.75rem;"><strong>{% trans "Phone:" %}</strong>
                     <a href="{{ whatsapp_link }}" target="_blank" class="btn btn-sm btn-success"
                         style="display: inline-flex; align-items: center; gap: 0.25rem; margin-left: 0.5rem; background-color: #25D366; border-color: #25D366;">
@@ -45,14 +42,12 @@
             </div>
 
             <div class="col-md-6">
-                <h5 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;"><strong>{% trans "Current
-                        Status" %}</strong></h5>
+                <h5 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;"><strong>{% trans "Current Status" %}</strong></h5>
                 <p style="color: var(--text-secondary); margin-bottom: 0.75rem;">
                     <strong>{% trans "Type:" %}</strong>
                     <span class="badge"
                         style="background-color: {% if customer.customer_type == 'special' %}rgba(255, 193, 7, 0.3); color: #ffc107{% else %}rgba(108, 117, 125, 0.3); color: #6c757d{% endif %}; display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px; font-weight: 600; font-size: 1em; margin-left: 0.5rem;">
-                        {% if customer.customer_type == 'special' %}⭐ {% trans "Special" %}{% else %}{% trans "Standard"
-                        %}{% endif %}
+                        {% if customer.customer_type == 'special' %}⭐ {% trans "Special" %}{% else %}{% trans "Standard" %}{% endif %}
                     </span>
                 </p>
                 <p style="color: var(--text-secondary); margin-bottom: 0.75rem;">
@@ -68,25 +63,21 @@
 
         <hr style="border: 1px solid var(--border-color);">
 
-        <h5 style="color: var(--text-primary); font-weight: 600; margin: 1.5rem 0 1rem 0;"><strong>{% trans "Customer
-                Request" %}</strong></h5>
+        <h5 style="color: var(--text-primary); font-weight: 600; margin: 1.5rem 0 1rem 0;"><strong>{% trans "Customer Request" %}</strong></h5>
         <p style="color: var(--text-secondary);">{{ customer.request|linebreaks }}</p>
 
         <hr style="border: 1px solid var(--border-color);">
 
         <div class="row">
             <div class="col-md-6">
-                <h5 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;"><strong>{% trans
-                        "Timeline" %}</strong></h5>
+                <h5 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;"><strong>{% trans "Timeline" %}</strong></h5>
                 <p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>{% trans "Created:" %}</strong>
                     {{ created_at_fixed|date:"M d, Y h:i A" }}</p>
-                <p style="color: var(--text-secondary);"><strong>{% trans "Last Updated:" %}</strong> {{
-                    updated_at_fixed|date:"M d, Y h:i A" }}</p>
+                <p style="color: var(--text-secondary);"><strong>{% trans "Last Updated:" %}</strong> {{ updated_at_fixed|date:"M d, Y h:i A" }}</p>
             </div>
 
             <div class="col-md-6">
-                <h5 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;"><strong>{% trans "Sales
-                        Representative" %}</strong></h5>
+                <h5 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;"><strong>{% trans "Sales Representative" %}</strong></h5>
                 <p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>{% trans "Name:" %}</strong>
                     {{customer.sales_rep.username }}</p>
                 <p style="color: var(--text-secondary);"><strong>{% trans "Phone:" %}</strong>
@@ -107,18 +98,14 @@
 
         <!-- Stage History -->
         {% if customer.stage_history.all %}
-        <h5 style="color: var(--text-primary); font-weight: 600; margin: 1.5rem 0 1rem 0;"><strong>{% trans "Stage
-                History" %}</strong></h5>
+        <h5 style="color: var(--text-primary); font-weight: 600; margin: 1.5rem 0 1rem 0;"><strong>{% trans "Stage History" %}</strong></h5>
         <div style="overflow-x: auto;">
             <table class="table" style="margin: 0; color: var(--text-primary);">
                 <thead style="background-color: rgba(201, 168, 76, 0.15); border-bottom: 2px solid var(--gold-accent);">
                     <tr>
-                        <th style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans
-                            "From" %}</th>
-                        <th style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans
-                            "To" %}</th>
-                        <th style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans
-                            "Date" %}</th>
+                        <th style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans "From" %}</th>
+                        <th style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans "To" %}</th>
+                        <th style="color: var(--gold-accent); font-weight: 600; padding: 1rem; border: none;">{% trans "Date" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -128,8 +115,7 @@
                         <td style="padding: 1rem;"><span class="badge"
                                 style="background-color: rgba(40, 167, 69, 0.3); color: #28a745; display: inline-block; padding: 0.4rem 0.8rem; border-radius: 12px;">{{history.new_stage}}</span>
                         </td>
-                        <td style="padding: 1rem; color: var(--text-secondary);">{{ history.changed_at_fixed|date:"M d,
-                            Y h:i A"}}</td>
+                        <td style="padding: 1rem; color: var(--text-secondary);">{{ history.changed_at_fixed|date:"M d,Y h:i A"}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
