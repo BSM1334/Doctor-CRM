@@ -58,6 +58,10 @@ rmdir /s /q env
 
 py manage.py shell
 
+Create superuser:
+py manage.py createsuperuser
+
+
 
 
 
