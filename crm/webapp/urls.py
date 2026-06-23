@@ -1,8 +1,16 @@
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import TemplateView
+from django.conf.urls.i18n import i18n_patterns
 from . import views
 
-urlpatterns = [
+# Non-language-prefixed patterns (static files, API, etc.)
+non_i18n_patterns = [
+    path('manifest.json', TemplateView.as_view(template_name='webapp/manifest.json', content_type='application/json'), name='manifest'),
+    path('sw.js', TemplateView.as_view(template_name='webapp/sw.js', content_type='application/javascript'), name='service_worker'),
+]
+
+# Language-prefixed patterns
+i18n_urlpatterns = [
     # Authentication
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
@@ -45,8 +53,6 @@ urlpatterns = [
     path('reset-password/<int:user_id>/', views.reset_password, name='reset_password'),
     path('change-password/', views.change_password, name='change_password'),
     path('manage-permissions/<int:user_id>/', views.manage_permissions, name='manage_permissions'),
-    
-    # PWA files
-    path('manifest.json', TemplateView.as_view(template_name='webapp/manifest.json', content_type='application/json'), name='manifest'),
-    path('sw.js', TemplateView.as_view(template_name='webapp/sw.js', content_type='application/javascript'), name='service_worker'),
 ]
+
+urlpatterns = non_i18n_patterns + i18n_patterns(*i18n_urlpatterns)
